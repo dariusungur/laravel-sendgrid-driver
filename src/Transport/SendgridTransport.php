@@ -8,6 +8,7 @@ use Illuminate\Mail\Transport\Transport;
 use Sichikawa\LaravelSendgridDriver\SendGrid;
 use Swift_Attachment;
 use Swift_Image;
+use Swift_Mime_Message;
 use Swift_Mime_SimpleMessage;
 use Swift_MimePart;
 
@@ -40,7 +41,7 @@ class SendgridTransport extends Transport
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
+    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
     {
         $this->beforeSendPerformed($message);
 
@@ -93,7 +94,7 @@ class SendgridTransport extends Transport
      * @param Swift_Mime_SimpleMessage $message
      * @return array
      */
-    private function getPersonalizations(Swift_Mime_SimpleMessage $message)
+    private function getPersonalizations(Swift_Mime_Message $message)
     {
         $setter = function (array $addresses) {
             $recipients = [];
@@ -124,10 +125,10 @@ class SendgridTransport extends Transport
     /**
      * Get From Addresses.
      *
-     * @param Swift_Mime_SimpleMessage $message
+     * @param Swift_Mime_Message $message
      * @return array
      */
-    private function getFrom(Swift_Mime_SimpleMessage $message)
+    private function getFrom(Swift_Mime_Message $message)
     {
         if ($message->getFrom()) {
             foreach ($message->getFrom() as $email => $name) {
@@ -140,10 +141,10 @@ class SendgridTransport extends Transport
     /**
      * Get ReplyTo Addresses.
      *
-     * @param Swift_Mime_SimpleMessage $message
+     * @param Swift_Mime_Message $message
      * @return array
      */
-    private function getReplyTo(Swift_Mime_SimpleMessage $message)
+    private function getReplyTo(Swift_Mime_Message $message)
     {
         if ($message->getReplyTo()) {
             foreach ($message->getReplyTo() as $email => $name) {
@@ -156,10 +157,10 @@ class SendgridTransport extends Transport
     /**
      * Get contents.
      *
-     * @param Swift_Mime_SimpleMessage $message
+     * @param Swift_Mime_Message $message
      * @return array
      */
-    private function getContents(Swift_Mime_SimpleMessage $message)
+    private function getContents(Swift_Mime_Message $message)
     {
         $contentType = $message->getContentType();
         switch ($contentType) {
@@ -203,10 +204,10 @@ class SendgridTransport extends Transport
     }
 
     /**
-     * @param Swift_Mime_SimpleMessage $message
+     * @param Swift_Mime_Message $message
      * @return array
      */
-    private function getAttachments(Swift_Mime_SimpleMessage $message)
+    private function getAttachments(Swift_Mime_Message $message)
     {
         $attachments = [];
         foreach ($message->getChildren() as $attachment) {
@@ -230,12 +231,12 @@ class SendgridTransport extends Transport
     /**
      * Set Request Body Parameters
      *
-     * @param Swift_Mime_SimpleMessage $message
+     * @param Swift_Mime_Message $message
      * @param array $data
      * @return array
      * @throws \Exception
      */
-    protected function setParameters(Swift_Mime_SimpleMessage $message, $data)
+    protected function setParameters(Swift_Mime_Message $message, $data)
     {
         $this->numberOfRecipients = 0;
 
